@@ -20,7 +20,7 @@ export default function InfiniteCarousel() {
   const [sceneW, setSceneW]   = useState(0);
   const [hovered, setHovered] = useState(false);
 
-  const slidingRef = useRef(false);
+  const isJumping  = useRef(false);
   const pausedRef  = useRef(false);
   const dragStart  = useRef<number | null>(null);
   const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -31,82 +31,107 @@ export default function InfiniteCarousel() {
 
   useEffect(() => { currentRef.current = current; }, [current]);
 
-  // Fetch items
   useEffect(() => {
     fetch("/api/carousel")
       .then((r) => r.json() as Promise<{ results: CarouselItem[] }>)
       .then((d) => setItems(d.results || []));
   }, []);
 
-  // Measure width — sceneRef div is ALWAYS in the DOM so this always fires correctly
   useEffect(() => {
     const el = sceneRef.current;
     if (!el) return;
-
     const measure = () => {
       const w = el.getBoundingClientRect().width;
       if (w > 0) setSceneW(w);
     };
-
-    measure(); // immediate read on mount
+    measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []); // empty deps — runs once, el is always mounted
+  }, []);
 
   const TOTAL = items.length;
   const sv    = sceneW * SIDE_RATIO;
   const cw    = sceneW > 0 ? sceneW - 2 * (sv + GAP) : 0;
   const ch    = cw > 0 ? Math.round(cw / (16 / 6.2)) : 0;
-  const tIdx  = current + 1;
+
+  // tIdx is 1-based because extendedItems = [clone-last, ...items, clone-first]
+  // so real item[0] is at index 1 in the extended array
+  const tIdx = current + 1;
 
   const getX = useCallback(
     (ti: number) => -(ti * (cw + GAP)) + sv + GAP,
     [cw, sv]
   );
 
+  // Move track instantly (no animation) to a given track index
   const jumpSilent = useCallback(
     (ti: number) => {
-      if (!trackRef.current) return;
-      trackRef.current.style.transition = "none";
-      trackRef.current.style.transform  = `translateX(${getX(ti)}px)`;
+      const el = trackRef.current;
+      if (!el) return;
+      el.style.transition = "none";
+      el.style.transform  = `translateX(${getX(ti)}px)`;
+      // force reflow so the next transition isn't skipped
+      void el.offsetHeight;
+    },
+    [getX]
+  );
+
+  // Animate to a given track index
+  const animateTo = useCallback(
+    (ti: number) => {
+      const el = trackRef.current;
+      if (!el) return;
+      el.style.transition = "transform 0.48s cubic-bezier(0.4,0,0.2,1)";
+      el.style.transform  = `translateX(${getX(ti)}px)`;
     },
     [getX]
   );
 
   const goTo = useCallback(
-    (idx: number) => {
-      if (slidingRef.current || TOTAL === 0) return;
-      slidingRef.current = true;
-      const realIdx = ((idx % TOTAL) + TOTAL) % TOTAL;
-      setCurrent(realIdx);
-      currentRef.current = realIdx;
+    (nextReal: number) => {
+      if (isJumping.current || TOTAL === 0) return;
+      isJumping.current = true;
 
+      const wrappedReal = ((nextReal % TOTAL) + TOTAL) % TOTAL;
+      const nextTIdx    = nextReal + 1; // track index in extended array
+
+      // Animate to the requested track index (may be clone at 0 or TOTAL+1)
+      animateTo(nextTIdx);
+      setCurrent(wrappedReal);
+      currentRef.current = wrappedReal;
+
+      // After animation completes, silently jump to real position if we landed on a clone
       setTimeout(() => {
-        if (idx >= TOTAL) {
-          setCurrent(0);
-          currentRef.current = 0;
+        if (nextReal >= TOTAL) {
+          // we animated to the clone-first at end → jump back to real index 1
           jumpSilent(1);
-        } else if (idx < 0) {
-          setCurrent(TOTAL - 1);
-          currentRef.current = TOTAL - 1;
+        } else if (nextReal < 0) {
+          // we animated to the clone-last at start → jump to real last index
           jumpSilent(TOTAL);
         }
-        slidingRef.current = false;
+        isJumping.current = false;
       }, 490);
     },
-    [TOTAL, jumpSilent]
+    [TOTAL, animateTo, jumpSilent]
   );
 
-  const next = useCallback(() => goTo(currentRef.current + 1), [goTo]);
-  const prev = useCallback(() => goTo(currentRef.current - 1), [goTo]);
+  const next = useCallback(() => {
+    if (isJumping.current) return;
+    goTo(currentRef.current + 1);
+  }, [goTo]);
+
+  const prev = useCallback(() => {
+    if (isJumping.current) return;
+    goTo(currentRef.current - 1);
+  }, [goTo]);
 
   // Auto-play
   useEffect(() => {
     if (TOTAL === 0) return;
     const schedule = () => {
       timerRef.current = setTimeout(() => {
-        if (!pausedRef.current) next();
+        if (!pausedRef.current && !isJumping.current) next();
         schedule();
       }, 4000);
     };
@@ -114,11 +139,12 @@ export default function InfiniteCarousel() {
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [TOTAL, next]);
 
-  // Sync track position whenever current or cw changes
+  // On initial render and when cw changes, set position without animation
   useEffect(() => {
-    if (!trackRef.current || cw === 0) return;
-    trackRef.current.style.transform = `translateX(${getX(tIdx)}px)`;
-  }, [current, cw, getX, tIdx]);
+    if (cw === 0) return;
+    jumpSilent(tIdx);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cw]);
 
   const handleClick = (item: CarouselItem) => {
     if (item.link_type === "product") router.push(`/products/${item.link_value}`);
@@ -134,15 +160,6 @@ export default function InfiniteCarousel() {
     <>
       <style>{css}</style>
       <div className="hc-outer">
-
-        {/*
-          KEY FIX: sceneRef div renders unconditionally.
-          Previously we returned null when items were empty,
-          which meant sceneRef was never mounted, so ResizeObserver
-          never fired, so sceneW stayed 0 forever.
-          Now the div is always there — width is measured immediately,
-          and slides appear as soon as items load from the API.
-        */}
         <div
           ref={sceneRef}
           className="hc-scene"
@@ -160,10 +177,6 @@ export default function InfiniteCarousel() {
             <div
               ref={trackRef}
               className="hc-track"
-              style={{
-                transform:  `translateX(${getX(tIdx)}px)`,
-                transition: "transform 0.48s cubic-bezier(0.4,0,0.2,1)",
-              }}
             >
               {extendedItems.map((item, i) => {
                 const isCenter = i === tIdx;
@@ -176,8 +189,8 @@ export default function InfiniteCarousel() {
                       width:      cw,
                       height:     ch,
                       marginLeft: i === 0 ? 0 : GAP,
-                      transform:  isCenter ? "scale(1)"  : "scale(0.9)",
-                      opacity:    isCenter ? 1            : 0.65,
+                      transform:  isCenter ? "scale(1)"    : "scale(0.9)",
+                      opacity:    isCenter ? 1              : 0.65,
                       boxShadow:  isCenter
                         ? "0 8px 40px rgba(0,0,0,0.22)"
                         : "none",
