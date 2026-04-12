@@ -8,94 +8,94 @@ type CarouselItem = {
   link_type: string;
   link_value: string;
   sort_order: number;
+  created_at: string;
 };
 
 const SIDE_RATIO = 0.12;
 const GAP = 10;
 
-export default function HeroCarousel() {
+export default function InfiniteCarousel() {
   const [items, setItems] = useState<CarouselItem[]>([]);
   const [current, setCurrent] = useState(0);
   const [sceneW, setSceneW] = useState(0);
   const [hovered, setHovered] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const slidingRef  = useRef(false);
-  const pausedRef   = useRef(false);
-  const dragStart   = useRef<number | null>(null);
-  const timerRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const trackRef    = useRef<HTMLDivElement>(null);
-  const sceneRef    = useRef<HTMLDivElement>(null);
-  const currentRef  = useRef(0); // mirror of current for use inside closures
-  const router      = useRouter();
+  const slidingRef = useRef(false);
+  const pausedRef  = useRef(false);
+  const dragStart  = useRef<number | null>(null);
+  const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const trackRef   = useRef<HTMLDivElement>(null);
+  const sceneRef   = useRef<HTMLDivElement>(null);
+  const currentRef = useRef(0);
+  const router     = useRouter();
 
-  // Keep currentRef in sync
   useEffect(() => { currentRef.current = current; }, [current]);
 
-  // Fetch carousel items
+  // Mark as mounted (client-only)
+  useEffect(() => { setMounted(true); }, []);
+
+  // Fetch items
   useEffect(() => {
     fetch("/api/carousel")
       .then((r) => r.json() as Promise<{ results: CarouselItem[] }>)
       .then((d) => setItems(d.results || []));
   }, []);
 
-  // ─── Dimensions ────────────────────────────────────────────────────────────
-  const TOTAL  = items.length;
-  const sv     = sceneW * SIDE_RATIO;
-  const cw     = sceneW > 0 ? sceneW - 2 * (sv + GAP) : 0;
-  const ch     = cw > 0 ? Math.round(cw / (16 / 6.2)) : 0;
-  // Extended track: [clone-last, real-0 … real-N, clone-first]  → real slide i at trackIdx i+1
-  const tIdx   = current + 1;
-  const getX   = (ti: number) => -(ti * (cw + GAP)) + sv + GAP;
-
-  // ─── ResizeObserver + immediate getBoundingClientRect ──────────────────────
+  // Read width only after mounted on client
   useEffect(() => {
+    if (!mounted) return;
     const el = sceneRef.current;
     if (!el) return;
 
-    // Read immediately — works when layout is already done (e.g. hard refresh)
-    const immediate = el.getBoundingClientRect().width;
-    if (immediate > 0) setSceneW(immediate);
+    const measure = () => {
+      const w = el.getBoundingClientRect().width;
+      if (w > 0) setSceneW(w);
+    };
 
-    // ResizeObserver as fallback and for actual window resizes
-    const ro = new ResizeObserver((entries) => {
-      const w = entries[0].contentRect.width;
-      if (w > 0) setSceneW((prev) => (prev === w ? prev : w));
-    });
+    measure(); // immediate read
+
+    const ro = new ResizeObserver(() => measure());
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [mounted]);
 
-  // ─── Silently snap track position without animation ────────────────────────
+  const TOTAL = items.length;
+  const sv    = sceneW * SIDE_RATIO;
+  const cw    = sceneW > 0 ? sceneW - 2 * (sv + GAP) : 0;
+  const ch    = cw > 0 ? Math.round(cw / (16 / 6.2)) : 0;
+  const tIdx  = current + 1;
+  const getX  = useCallback(
+    (ti: number) => -(ti * (cw + GAP)) + sv + GAP,
+    [cw, sv]
+  );
+
   const jumpSilent = useCallback(
     (ti: number) => {
       if (!trackRef.current) return;
       trackRef.current.style.transition = "none";
       trackRef.current.style.transform  = `translateX(${getX(ti)}px)`;
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cw, sv]
+    [getX]
   );
 
-  // ─── Navigate to a real index ──────────────────────────────────────────────
   const goTo = useCallback(
     (idx: number) => {
       if (slidingRef.current || TOTAL === 0) return;
       slidingRef.current = true;
-
-      // wrap to real range
       const realIdx = ((idx % TOTAL) + TOTAL) % TOTAL;
       setCurrent(realIdx);
+      currentRef.current = realIdx;
 
       setTimeout(() => {
-        // If we animated to a clone, silently snap to the real counterpart
         if (idx >= TOTAL) {
-          // animated to clone-of-first (trackIdx TOTAL+1) → snap to real first
-          jumpSilent(1);
           setCurrent(0);
+          currentRef.current = 0;
+          jumpSilent(1);
         } else if (idx < 0) {
-          // animated to clone-of-last (trackIdx 0) → snap to real last
-          jumpSilent(TOTAL);
           setCurrent(TOTAL - 1);
+          currentRef.current = TOTAL - 1;
+          jumpSilent(TOTAL);
         }
         slidingRef.current = false;
       }, 490);
@@ -106,7 +106,7 @@ export default function HeroCarousel() {
   const next = useCallback(() => goTo(currentRef.current + 1), [goTo]);
   const prev = useCallback(() => goTo(currentRef.current - 1), [goTo]);
 
-  // ─── Auto-play ─────────────────────────────────────────────────────────────
+  // Auto-play
   useEffect(() => {
     if (TOTAL === 0) return;
     const schedule = () => {
@@ -119,25 +119,22 @@ export default function HeroCarousel() {
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [TOTAL, next]);
 
-  // ─── Sync track position whenever current or sceneW changes ───────────────
+  // Sync track position on current or cw change
   useEffect(() => {
     if (!trackRef.current || cw === 0) return;
-    // Let CSS transition handle animated slides; here we just keep the position correct.
     trackRef.current.style.transform = `translateX(${getX(tIdx)}px)`;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current, cw]);
+  }, [current, cw, getX, tIdx]);
 
-  // ─── Click handler ─────────────────────────────────────────────────────────
   const handleClick = (item: CarouselItem) => {
     if (item.link_type === "product") router.push(`/products/${item.link_value}`);
     else router.push(`/category/${item.link_value}`);
   };
 
-  // ─── Extended items array: [last, ...all, first] ───────────────────────────
   const extendedItems =
     TOTAL > 0 ? [items[TOTAL - 1], ...items, items[0]] : [];
 
-  if (items.length === 0) return null;
+  // Don't render until mounted and we have a width
+  if (!mounted || items.length === 0) return null;
 
   return (
     <>
@@ -167,19 +164,17 @@ export default function HeroCarousel() {
             >
               {extendedItems.map((item, i) => {
                 const isCenter = i === tIdx;
-                // real index of this slot (for click-to-navigate on side cards)
                 const realIdx  = ((i - 1) % TOTAL + TOTAL) % TOTAL;
-
                 return (
                   <div
                     key={`${i}-${item.id}`}
                     className="hc-slide"
                     style={{
-                      width:     cw,
-                      height:    ch,
+                      width:      cw,
+                      height:     ch,
                       marginLeft: i === 0 ? 0 : GAP,
-                      transform:  isCenter ? "scale(1)"   : "scale(0.9)",
-                      opacity:    isCenter ? 1             : 0.65,
+                      transform:  isCenter ? "scale(1)"  : "scale(0.9)",
+                      opacity:    isCenter ? 1            : 0.65,
                       boxShadow:  isCenter
                         ? "0 8px 40px rgba(0,0,0,0.22)"
                         : "none",
@@ -257,7 +252,6 @@ const css = `
     gap: 16px;
     overflow: hidden;
   }
-
   .hc-scene {
     position: relative;
     width: 100%;
@@ -265,24 +259,21 @@ const css = `
     user-select: none;
     touch-action: pan-y;
   }
-
   .hc-track {
     display: flex;
     align-items: center;
     will-change: transform;
   }
-
   .hc-slide {
     flex-shrink: 0;
     border-radius: 14px;
     overflow: hidden;
     cursor: pointer;
     transition:
-      transform   0.48s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity     0.48s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow  0.48s cubic-bezier(0.4, 0, 0.2, 1);
+      transform  0.48s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity    0.48s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.48s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
   .hc-img {
     width: 100%;
     height: 100%;
@@ -291,8 +282,6 @@ const css = `
     display: block;
     pointer-events: none;
   }
-
-  /* ── Arrows ── */
   .hc-arrow {
     position: absolute;
     top: 50%;
@@ -301,7 +290,7 @@ const css = `
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255,255,255,0.92);
     border: none;
     display: flex;
     align-items: center;
@@ -319,8 +308,6 @@ const css = `
   }
   .hc-arrow--left  { left: 16px; }
   .hc-arrow--right { right: 16px; }
-
-  /* ── Dots ── */
   .hc-dots {
     display: flex;
     gap: 6px;
@@ -340,8 +327,6 @@ const css = `
     background: #FFE14D;
     width: 28px;
   }
-
-  /* ── Responsive ── */
   @media (max-width: 768px) {
     .hc-arrow--left  { left: 8px; }
     .hc-arrow--right { right: 8px; }
