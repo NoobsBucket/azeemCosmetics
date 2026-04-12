@@ -212,6 +212,10 @@ const css = `
   @media (max-width: 600px) {
     .cat-page { padding: 80px 14px 80px; }
     .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .cat-header { flex-direction: column; align-items: flex-start; }
+    .cat-header {
+     flex-direction: column;
+      align-items: flex-start;
+       margin-top:46px;
+       }
   }
 `;

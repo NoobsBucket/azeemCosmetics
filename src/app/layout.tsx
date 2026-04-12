@@ -20,7 +20,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "CrashCart",
+  title: "CrashCosmetic",
   icons: {
     icon: "/logo.png",
   },
