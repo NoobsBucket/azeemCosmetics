@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import ProductSections from "./ProductSections";
 
 // ── Types from API ──────────────────────────────────────────────────────────
 interface HomepageSection {
   id: number;
-  type: "promo_banners" | "category_carousel" | "brand_grid" | "category_circles";
+  type: "promo_banners" | "category_carousel" | "brand_grid" | "category_circles" | "product_sections";
   label: string;
   sort_order: number;
   enabled: number;
@@ -16,6 +17,16 @@ interface BannerItem   { id: string; image_url: string; heading: string; button_
 interface CarouselItem { id: string; image_url: string; link_type: string; link_value: string }
 interface BrandItem    { id: string; name: string; logo_url?: string; link_type: string; link_value: string }
 interface CategoryItem { id: number; name: string; slug: string; image_url?: string }
+
+// ── Shuffle ─────────────────────────────────────────────────────────────────
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 // ── Inline section renderers ────────────────────────────────────────────────
 
@@ -181,18 +192,15 @@ function CategoryCirclesSection() {
   );
 }
 
-// ── Missing import ──────────────────────────────────────────────────────────
-import { useRef } from "react";
-
-// ── Shuffle ─────────────────────────────────────────────────────────────────
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+// ── Sentinel type for product sections injection ────────────────────────────
+const PRODUCT_SECTIONS_SENTINEL: HomepageSection = {
+  id: -1,
+  type: "product_sections",
+  label: "Product Sections",
+  sort_order: 0,
+  enabled: 1,
+  items: "[]",
+};
 
 // ── Main ────────────────────────────────────────────────────────────────────
 export default function HomepageBuilder() {
@@ -209,7 +217,12 @@ export default function HomepageBuilder() {
 
   const shuffled = useMemo(() => {
     if (!loaded) return [];
-    return shuffle(sections.filter(s => s.enabled === 1));
+    // Shuffle the enabled API sections
+    const enabled = shuffle(sections.filter(s => s.enabled === 1));
+    // Insert ProductSections at a random position
+    const insertAt = Math.floor(Math.random() * (enabled.length + 1));
+    enabled.splice(insertAt, 0, PRODUCT_SECTIONS_SENTINEL);
+    return enabled;
   }, [loaded, sections]);
 
   if (!loaded) return (
@@ -232,10 +245,11 @@ export default function HomepageBuilder() {
         try { items = JSON.parse(section.items); } catch {}
 
         switch (section.type) {
-          case "promo_banners":     return <PromoSection      key={section.id} items={items} />;
-          case "category_carousel": return <CarouselSection   key={section.id} items={items} />;
-          case "brand_grid":        return <BrandSection      key={section.id} items={items} />;
+          case "promo_banners":     return <PromoSection          key={section.id} items={items} />;
+          case "category_carousel": return <CarouselSection       key={section.id} items={items} />;
+          case "brand_grid":        return <BrandSection          key={section.id} items={items} />;
           case "category_circles":  return <CategoryCirclesSection key={section.id} />;
+          case "product_sections":  return <ProductSections        key={section.id} />;
           default:                  return null;
         }
       })}

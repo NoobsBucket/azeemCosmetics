@@ -70,7 +70,7 @@ const css = `
   }
   .pb-card--wide { grid-column: 1 / -1; aspect-ratio: 16/5; }
   .pb-card:hover { transform: translate(-3px,-3px); box-shadow: 8px 8px 0 #111; }
-  .pb-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+  .pb-img { width: 100%; height: 110%; display: block; transition: transform .4s; }
   .pb-card:hover .pb-img { transform: scale(1.03); }
   .pb-shine {
     position: absolute; inset: 0; pointer-events: none;
