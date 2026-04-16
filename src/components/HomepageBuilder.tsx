@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import ProductSections from "./ProductSections";
+import ProductSections from "./cardDisplay";
 
 // ── Types from API ──────────────────────────────────────────────────────────
 interface HomepageSection {
