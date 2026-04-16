@@ -1,10 +1,10 @@
-export const runtime = 'experimental-edge';
+export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-// Fallback hardcoded list — used only if the DB lookup fails (network error etc.)
-// Keep at least one email here as a safety net
+// Fallback hardcoded list — used only if the DB lookup fails
 const FALLBACK_ADMIN_EMAILS = ["nbdotwork@gmail.com"];
 
 const PUBLIC_ROUTES = [
@@ -22,7 +22,7 @@ const PUBLIC_ROUTES = [
   /^\/api\/search/,
   /^\/auth/,
   /^\/api\/auth/,
-  /^\/api\/settings/, // settings must be public so the footer + navbar can read it
+  /^\/api\/settings/,
 ];
 
 const ADMIN_ROUTES = [
@@ -33,33 +33,53 @@ const ADMIN_ROUTES = [
 function isPublicRoute(pathname: string) {
   return PUBLIC_ROUTES.some(r => r.test(pathname));
 }
+
 function isAdminRoute(pathname: string) {
   return ADMIN_ROUTES.some(r => r.test(pathname));
 }
 
-// Fetch admin emails from the settings table.
-// Uses the Supabase REST API directly (no SDK needed) so we don't bloat the edge bundle.
-async function fetchAdminEmails(supabaseUrl: string, supabaseAnonKey: string): Promise<string[]> {
+// Fetch admin emails from D1 database
+async function fetchAdminEmails(): Promise<string[]> {
   try {
-    const res = await fetch(
-      `${supabaseUrl}/rest/v1/settings?key=eq.admin_emails&select=value`,
-      {
-        headers: {
-          apikey: supabaseAnonKey,
-          Authorization: `Bearer ${supabaseAnonKey}`,
-          'Content-Type': 'application/json',
-        },
-        // edge cache for 60 seconds so we're not hitting the DB on every request
-        // @ts-ignore — Next.js edge fetch supports this
-        next: { revalidate: 60 },
-      }
-    );
-    if (!res.ok) return FALLBACK_ADMIN_EMAILS;
-    const rows = await res.json() as { value: string }[];
-    if (!rows || rows.length === 0) return FALLBACK_ADMIN_EMAILS;
-    const parsed = JSON.parse(rows[0].value) as string[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : FALLBACK_ADMIN_EMAILS;
-  } catch {
+    const { env } = await getCloudflareContext({ async: true });
+    const db = (env as { DB: any }).DB;
+    
+    if (!db) {
+      console.error('D1 database not available, using fallback');
+      return FALLBACK_ADMIN_EMAILS;
+    }
+
+    const result = await db
+      .prepare('SELECT value FROM settings WHERE key = ?')
+      .bind('admin_emails')
+      .all();
+
+    if (!result.results || result.results.length === 0) {
+      console.warn('No admin_emails setting found in database, using fallback');
+      return FALLBACK_ADMIN_EMAILS;
+    }
+
+    const rawValue = (result.results[0] as { value: string }).value;
+    console.log('Raw admin_emails value from D1:', rawValue);
+
+    // Parse the JSON value
+    let parsed: string[] = [];
+    try {
+      parsed = JSON.parse(rawValue);
+    } catch (e) {
+      console.error('Failed to parse admin_emails JSON:', rawValue, e);
+      return FALLBACK_ADMIN_EMAILS;
+    }
+
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      console.warn('admin_emails is not a valid array:', parsed);
+      return FALLBACK_ADMIN_EMAILS;
+    }
+
+    console.log('Admin emails successfully loaded:', parsed);
+    return parsed;
+  } catch (error) {
+    console.error('Error fetching admin emails from D1:', error);
     return FALLBACK_ADMIN_EMAILS;
   }
 }
@@ -69,6 +89,7 @@ export default async function middleware(request: NextRequest) {
 
   let response = NextResponse.next({ request });
 
+  // Initialize Supabase client
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -90,25 +111,35 @@ export default async function middleware(request: NextRequest) {
     }
   );
 
+  // Get authenticated user from Supabase
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Check admin routes
   if (isAdminRoute(pathname)) {
-    if (!user) return NextResponse.redirect(new URL('/', request.url));
+    if (!user) {
+      console.log('No user found, redirecting to login');
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
 
-    // Dynamically fetch admin emails from settings table
-    const adminEmails = await fetchAdminEmails(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    console.log('Admin access check for user:', user.email);
+
+    // Fetch admin emails from D1
+    const adminEmails = await fetchAdminEmails();
+    console.log('Checking if', user.email, 'is in admin list:', adminEmails);
 
     if (!adminEmails.includes(user.email ?? '')) {
+      console.log('User', user.email, 'is NOT an admin, denying access');
       return NextResponse.redirect(new URL('/', request.url));
     }
+
+    console.log('User', user.email, 'is an admin, granting access');
     return response;
   }
 
+  // Check protected routes (non-public routes require login)
   if (!isPublicRoute(pathname) && !user) {
-    return NextResponse.redirect(new URL('/', request.url));
+    console.log('Protected route accessed without user, redirecting to login');
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return response;
