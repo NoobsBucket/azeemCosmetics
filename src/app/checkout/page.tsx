@@ -508,11 +508,15 @@ const css = `
     display: flex; align-items: center; justify-content: center;
     color: #fff; margin-bottom: 20px;
   }
+    @media (max-width: 600px) {
+       .co-page {padding: 160px 20px 100px;}
+    }
+
 
   @media (max-width: 600px) {
-    .co-page { padding: 70px 14px 80px; }
+    .co-page { padding: 143px 14px 80px; }
     .co-panel { padding: 22px 18px; }
-    .co-solo  { padding: 32px 22px; margin-top: 28px; }
+    .co-solo  { padding: 32px 22px; margin-top: 115px; }
     .co-display { font-size: 2rem; }
   }
 `;

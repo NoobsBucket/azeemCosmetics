@@ -403,6 +403,7 @@ const css = `
   }
   .or-delivery-row:last-child { border-bottom: none; }
   .or-delivery-row svg { flex-shrink: 0; margin-top: 2px; color: #FF3E5E; }
+@media (max-width: 1024px) {padding: 150px 20px 100px;}
 
   @media (max-width: 520px) {
     .or-body-inner { grid-template-columns: 1fr; }
@@ -411,7 +412,7 @@ const css = `
     .or-progress { display: none; }
   }
   @media (max-width: 600px) {
-    .or-page { padding: 70px 14px 80px; }
+    .or-page { padding: 150px 14px 80px; }
     .or-solo { padding: 32px 20px; margin-top: 95px; }
     .or-card-header { padding: 16px 18px; }
     .or-body-inner { padding: 16px 18px 18px; }
