@@ -18,7 +18,7 @@ interface CarouselItem { id: string; image_url: string; link_type: string; link_
 interface BrandItem    { id: string; name: string; logo_url?: string; link_type: string; link_value: string }
 interface CategoryItem { id: number; name: string; slug: string; image_url?: string }
 
-// ── Shuffle ─────────────────────────────────────────────────────────────────
+// ── helpers ─────────────────────────────────────────────────────────────────
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -26,6 +26,15 @@ function shuffle<T>(arr: T[]): T[] {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+/** Resolve any link_type/link_value pair to a proper URL path */
+function resolveLink(link_type: string, link_value: string): string {
+  if (!link_value) return "/";
+  if (link_type === "category") return `/category/${encodeURIComponent(link_value)}`;
+  if (link_type === "product")  return `/products/${link_value}`;
+  if (link_type === "url")      return link_value;
+  return "/";
 }
 
 // ── Inline section renderers ────────────────────────────────────────────────
@@ -38,7 +47,7 @@ function PromoSection({ items }: { items: BannerItem[] }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
         {items.map((b, i) => (
           <div key={b.id}
-            onClick={() => b.link_value && router.push(b.link_type === "category" ? `/?category=${b.link_value}` : `/products/${b.link_value}`)}
+            onClick={() => b.link_value && router.push(resolveLink(b.link_type, b.link_value))}
             style={{
               position: "relative", border: "2.5px solid #111", borderRadius: 14, overflow: "hidden",
               boxShadow: "5px 5px 0 #111", aspectRatio: i === 0 && items.length % 2 !== 0 ? "16/5" : "16/7",
@@ -65,9 +74,9 @@ function CarouselSection({ items }: { items: CarouselItem[] }) {
   const router = useRouter();
   const SPEED = 55;
   const trackRef = useRef<HTMLDivElement>(null);
-  const animRef = useRef<number | null>(null);
-  const paused = useRef(false);
-  const pos = useRef(0);
+  const animRef  = useRef<number | null>(null);
+  const paused   = useRef(false);
+  const pos      = useRef(0);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -95,7 +104,8 @@ function CarouselSection({ items }: { items: CarouselItem[] }) {
         onMouseEnter={() => { paused.current = true; }} onMouseLeave={() => { paused.current = false; }}>
         <div ref={trackRef} style={{ display: "flex", gap: 14, padding: "8px 20px", width: "max-content" }}>
           {doubled.map((item, i) => (
-            <div key={`${item.id}-${i}`} onClick={() => router.push(item.link_type === "category" ? `/?category=${item.link_value}` : `/products/${item.link_value}`)}
+            <div key={`${item.id}-${i}`}
+              onClick={() => router.push(resolveLink(item.link_type, item.link_value))}
               style={{ width: 220, height: 140, borderRadius: 12, overflow: "hidden", border: "2.5px solid #111", boxShadow: "4px 4px 0 #111", flexShrink: 0, cursor: "pointer" }}>
               <img src={item.image_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
@@ -112,8 +122,7 @@ function BrandSection({ items }: { items: BrandItem[] }) {
   const go = (b: BrandItem) => {
     if (!b.link_value) return;
     if (b.link_type === "url") window.open(b.link_value, "_blank", "noopener");
-    else if (b.link_type === "category") router.push(`/?category=${b.link_value}`);
-    else router.push(`/products/${b.link_value}`);
+    else router.push(resolveLink(b.link_type, b.link_value));
   };
   return (
     <section style={{ padding: "28px 20px 44px", maxWidth: 1400, margin: "0 auto", fontFamily: "'Jost', sans-serif" }}>
@@ -133,12 +142,12 @@ function BrandSection({ items }: { items: BrandItem[] }) {
 
 function CategoryCirclesSection() {
   const [cats, setCats] = useState<CategoryItem[]>([]);
-  const router = useRouter();
-  const SPEED = 55;
+  const router   = useRouter();
+  const SPEED    = 55;
   const trackRef = useRef<HTMLDivElement>(null);
-  const animRef = useRef<number | null>(null);
-  const paused = useRef(false);
-  const pos = useRef(0);
+  const animRef  = useRef<number | null>(null);
+  const paused   = useRef(false);
+  const pos      = useRef(0);
 
   useEffect(() => {
     fetch("/api/categories")
@@ -176,7 +185,10 @@ function CategoryCirclesSection() {
         onMouseEnter={() => { paused.current = true; }} onMouseLeave={() => { paused.current = false; }}>
         <div ref={trackRef} style={{ display: "flex", gap: 18, padding: "8px 40px", width: "max-content" }}>
           {items.map((cat, i) => (
-            <button key={`${cat.id}-${i}`} onClick={() => router.push(`/?category=${cat.slug}`)}
+            <button
+              key={`${cat.id}-${i}`}
+              // ✅ fixed: /category/:slug instead of /?category=
+              onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
               style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 9, background: "none", border: "none", cursor: "pointer", flexShrink: 0, padding: 4 }}>
               <div style={{ width: 88, height: 88, borderRadius: "50%", border: "2.5px solid #111", boxShadow: "4px 4px 0 #111", overflow: "hidden", background: "#FFF5F7", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {cat.image_url
@@ -192,20 +204,16 @@ function CategoryCirclesSection() {
   );
 }
 
-// ── Sentinel type for product sections injection ────────────────────────────
+// ── Sentinel ────────────────────────────────────────────────────────────────
 const PRODUCT_SECTIONS_SENTINEL: HomepageSection = {
-  id: -1,
-  type: "product_sections",
-  label: "Product Sections",
-  sort_order: 0,
-  enabled: 1,
-  items: "[]",
+  id: -1, type: "product_sections", label: "Product Sections",
+  sort_order: 0, enabled: 1, items: "[]",
 };
 
 // ── Main ────────────────────────────────────────────────────────────────────
 export default function HomepageBuilder() {
   const [sections, setSections] = useState<HomepageSection[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded,   setLoaded]   = useState(false);
 
   useEffect(() => {
     fetch("/api/homepage-sections")
@@ -217,9 +225,7 @@ export default function HomepageBuilder() {
 
   const shuffled = useMemo(() => {
     if (!loaded) return [];
-    // Shuffle the enabled API sections
     const enabled = shuffle(sections.filter(s => s.enabled === 1));
-    // Insert ProductSections at a random position
     const insertAt = Math.floor(Math.random() * (enabled.length + 1));
     enabled.splice(insertAt, 0, PRODUCT_SECTIONS_SENTINEL);
     return enabled;
@@ -243,13 +249,12 @@ export default function HomepageBuilder() {
       {shuffled.map(section => {
         let items: any[] = [];
         try { items = JSON.parse(section.items); } catch {}
-
         switch (section.type) {
-          case "promo_banners":     return <PromoSection          key={section.id} items={items} />;
-          case "category_carousel": return <CarouselSection       key={section.id} items={items} />;
-          case "brand_grid":        return <BrandSection          key={section.id} items={items} />;
-          case "category_circles":  return <CategoryCirclesSection key={section.id} />;
-          case "product_sections":  return <ProductSections        key={section.id} />;
+          case "promo_banners":     return <PromoSection           key={section.id} items={items} />;
+          case "category_carousel": return <CarouselSection        key={section.id} items={items} />;
+          case "brand_grid":        return <BrandSection           key={section.id} items={items} />;
+          case "category_circles":  return <CategoryCirclesSection  key={section.id} />;
+          case "product_sections":  return <ProductSections         key={section.id} />;
           default:                  return null;
         }
       })}
