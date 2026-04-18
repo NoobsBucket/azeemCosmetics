@@ -1,50 +1,90 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Category = { id: number; name: string; slug: string; image_url?: string };
 
-export default function CategoryCarousel() {
+const ITEM_W = 100;
+const GAP    = 20;
+const COPIES = 6;
+
+export default function CategoryCircles() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const router = useRouter();
+  const trackRef     = useRef<HTMLDivElement>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const offsetRef    = useRef(0);
+  const pausedRef    = useRef(false);
+  const router       = useRouter();
 
   useEffect(() => {
     fetch("/api/categories")
       .then(r => r.json() as Promise<{ results: Category[] }>)
-      .then(d => setCategories(d.results || []))
-      .catch(() => {});
+      .then(d => setCategories(d.results || []));
   }, []);
 
+  useEffect(() => {
+    if (categories.length === 0) return;
+    const track = trackRef.current;
+    if (!track) return;
+
+    // Exact width of one full set of items including gaps
+    const UNIT = categories.length * (ITEM_W + GAP);
+
+    const animate = () => {
+      if (!pausedRef.current) {
+        offsetRef.current += 0.5;
+        if (offsetRef.current >= UNIT) offsetRef.current -= UNIT;
+        track.style.transform = `translateX(-${offsetRef.current}px)`;
+      }
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animFrameRef.current = requestAnimationFrame(animate);
+    return () => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); };
+  }, [categories]);
+
   if (categories.length === 0) return null;
+
+  const repeated = Array.from({ length: COPIES }, () => categories).flat();
 
   return (
     <>
       <style>{css}</style>
-      <section className="cc-section">
-        <div className="cc-head">
-          <h2 className="cc-title">Shop by Category</h2>
-          <div className="cc-line" />
-        </div>
-
+      <section className="cc-wrap">
         <div className="cc-viewport">
-          <div className="cc-fade cc-fade--l" />
-          <div className="cc-fade cc-fade--r" />
-
-          <div className="cc-track">
-            {categories.map((cat) => (
+          <div
+            className="cc-track"
+            ref={trackRef}
+            onMouseEnter={() => { pausedRef.current = true; }}
+            onMouseLeave={() => { pausedRef.current = false; }}
+          >
+            {repeated.map((cat, i) => (
               <button
-                key={cat.id}
+                key={`${cat.id}-${i}`}
                 className="cc-item"
-                onClick={() => router.push(`/category/${cat.slug}`)}
+                onClick={() => router.push(`/category/${encodeURIComponent(cat.slug)}`)}
               >
-                <div className="cc-circle">
-                  {cat.image_url ? (
-                    <img src={cat.image_url} alt={cat.name} className="cc-img" />
-                  ) : (
-                    <span className="cc-fb">{cat.name[0]}</span>
-                  )}
+                {/* inner wrapper handles scale — keeps it separate from track translateX */}
+                <div className="cc-item-inner">
+                  <div className="cc-ring">
+                    <div className="cc-img-wrap">
+                      {cat.image_url ? (
+                        <img src={cat.image_url} alt={cat.name} className="cc-img" />
+                      ) : (
+                        <div className="cc-placeholder">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span className="cc-label">{cat.name}</span>
                 </div>
-                <span className="cc-label">{cat.name}</span>
               </button>
             ))}
           </div>
@@ -55,146 +95,124 @@ export default function CategoryCarousel() {
 }
 
 const css = `
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;700;800&display=swap');
+  .cc-wrap {
+    width: 100%;
+    padding: 20px 0 16px;
+    background: #fff;
+    margin-top: 60px;
+    overflow: hidden;
+  }
 
-.cc-section {
-  padding: 28px 0 36px;
-  font-family: 'Jost', sans-serif;
-  overflow: hidden;
-}
+  .cc-viewport {
+    width: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  }
 
-.cc-head {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 0 24px;
-  margin-bottom: 22px;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-}
+  .cc-track {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    padding: 20px 0 10px;
+    will-change: transform;
+  }
 
-.cc-title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #111;
-  white-space: nowrap;
-  letter-spacing: -.02em;
-  margin: 0;
-}
+  /* Fixed-size invisible hit target */
+  .cc-item {
+    flex-shrink: 0;
+    width: 100px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
 
-.cc-line {
-  flex: 1;
-  height: 2.5px;
-  background: #111;
-  border-radius: 1px;
-}
+  /* Scale lives here — isolated from the track's translateX */
+  .cc-item-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: center bottom;
+  }
+  .cc-item:hover .cc-item-inner {
+    transform: scale(1.22) translateY(-5px);
+  }
+  .cc-item:active .cc-item-inner {
+    transform: scale(1.1) translateY(-2px);
+  }
 
+  .cc-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF3E5E 0%, #FFE14D 50%, #00D084 100%);
+    padding: 3px;
+    box-shadow: 3px 3px 0 #111;
+    transition: box-shadow 0.2s, background 0.25s;
+  }
+  .cc-item:hover .cc-ring {
+    background: linear-gradient(135deg, #111 0%, #444 100%);
+    box-shadow: 4px 6px 0 #111;
+  }
 
-.cc-viewport {
-  position: relative;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  cursor: grab;
-}
+  .cc-img-wrap {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f5f5f5;
+    border: 3px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.cc-viewport:active {
-  cursor: grabbing;
-}
+  .cc-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
 
-.cc-viewport::-webkit-scrollbar {
-  display: none;
-}
+  .cc-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #efefef;
+    color: #999;
+    border-radius: 50%;
+  }
 
-.cc-fade {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 70px;
-  z-index: 2;
-  pointer-events: none;
-}
+  .cc-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #111;
+    text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
 
-.cc-fade--l {
-  left: 0;
-  background: linear-gradient(to right, #f5f5f5, transparent);
-}
+  @media (max-width: 1026px) {
+    .cc-wrap { margin-top: 120px; }
+  }
 
-.cc-fade--r {
-  right: 0;
-  background: linear-gradient(to left, #f5f5f5, transparent);
-}
-
-.cc-track {
-  display: flex;
-  gap: 18px;
-  padding: 8px 40px;
-  width: max-content;
-}
-
-.cc-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  padding: 4px;
-  transition: transform .2s;
-}
-
-.cc-item:hover {
-  transform: translateY(-4px);
-}
-
-.cc-circle {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  border: 2.5px solid #111;
-  box-shadow: 4px 4px 0 #111;
-  overflow: hidden;
-  background: #FFF5F7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: box-shadow .2s, border-color .2s;
-  flex-shrink: 0;
-}
-
-.cc-item:hover .cc-circle {
-  box-shadow: 5px 5px 0 #FF3E5E;
-  border-color: #FF3E5E;
-}
-
-.cc-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform .3s;
-}
-
-.cc-item:hover .cc-img {
-  transform: scale(1.1);
-}
-
-.cc-fb {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: #FF3E5E;
-}
-
-.cc-label {
-  font-size: .76rem;
-  font-weight: 800;
-  color: #111;
-  text-align: center;
-  max-width: 88px;
-  line-height: 1.3;
-}
+  @media (max-width: 600px) {
+    .cc-wrap { padding: 14px 0 12px; margin-top: 120px; }
+    .cc-item { width: 82px; }
+    .cc-ring { width: 68px; height: 68px; }
+    .cc-label { font-size: 0.65rem; }
+    .cc-track { gap: 14px; }
+  }
 `;
