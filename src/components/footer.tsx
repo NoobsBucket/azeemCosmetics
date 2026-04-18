@@ -124,7 +124,7 @@ fetch("/api/settings")
             </div>
           )}
 
-          {/* Footer message */}
+
           {footerMessage && (
             <p className="ft-message">{footerMessage}</p>
           )}
