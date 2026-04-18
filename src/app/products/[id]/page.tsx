@@ -270,7 +270,7 @@ export default function ProductDetailPage() {
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
         .pd-page { background: #f5f5f5; min-height: 100vh; font-family: 'Jost', sans-serif; }
-        .pd-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px 100px; animation: fadeUp 0.4s ease both; }
+        .pd-wrap { max-width: 1100px; margin: 60px auto; padding: 28px 24px 100px; animation: fadeUp 0.4s ease both; }
 
         .pd-back {
           display: inline-flex; align-items: center; gap: 6px;
@@ -445,7 +445,9 @@ export default function ProductDetailPage() {
           padding: 4px 14px; font-weight: 800; font-size: 0.82rem; color: #111;
           box-shadow: 2px 2px 0 #111; display: inline-flex; align-items: center; gap: 6px;
         }
-
+        @media (max-width: 1025px){
+        .pd-wrap {margin: 126px auto;}
+        }
         @media (max-width: 768px) {
           .pd-wrap {margin: 128px auto;}
           .pd-grid { flex-direction: column; gap: 0; }
