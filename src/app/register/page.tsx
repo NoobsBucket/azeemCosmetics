@@ -54,7 +54,7 @@ export default function RegisterPage() {
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
             </div>
-            <span className="logo-text">AzeenCosmatics</span>
+            <span className="logo-text">AzeemCosmatics</span>
           </div>
 
           {success ? (
@@ -73,7 +73,7 @@ export default function RegisterPage() {
           ) : (
             <>
               <h1 className="title">Create account<span className="dot">!</span></h1>
-              <p className="subtitle">Join AzeenCosmatics today — it&apos;s free</p>
+              <p className="subtitle">Join AzeemCosmatics today — it&apos;s free</p>
 
               <div className="oauth-row">
                 <button className="oauth-btn google" onClick={() => oauth("google")} disabled={loading}>

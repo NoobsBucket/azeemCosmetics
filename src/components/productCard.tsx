@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import style from "../styles/productCard.module.css";
 import { useCart } from "./CartContext";
 
-const DOMAIN = "https://Azeencosmetics.store/";
+const DOMAIN = "https://Azeemcosmetics.store/";
 const PREVIEW_COUNT = 4;
 
 type Product = {
@@ -103,7 +103,7 @@ function Lightbox({ product, onClose }: { product: Product; onClose: () => void;
           {product.tag && <span className={style.lbTag}>{product.tag}</span>}
           <h2 className={style.lbTitle}>{product.name}</h2>
           <p className={style.lbPrice}>RS {product.price.toFixed(2)}</p>
-          <div className={style.lbShareRow}><span className={style.lbShareUrl}>Azeencosmetics.store/products/{product.id}</span></div>
+          <div className={style.lbShareRow}><span className={style.lbShareUrl}>Azeemcosmetics.store/products/{product.id}</span></div>
           <div className={style.lbDivider}/>
           {product.description ? <p className={style.lbDesc}>{product.description}</p> : <p className={style.lbDesc} style={{ opacity: 0.4 }}>No description available.</p>}
           <div className={style.lbBtnGroup}>
