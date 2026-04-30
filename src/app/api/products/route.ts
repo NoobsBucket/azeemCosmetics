@@ -24,38 +24,69 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const categoryId = searchParams.get("category_id");
     const productId  = searchParams.get("id");
+    const page       = Math.max(1, Number(searchParams.get("page") ?? 1));
+    const limit      = 20;
+    const offset     = (page - 1) * limit;
 
+    // ── Single product ──────────────────────────────────────────
     if (productId) {
-      const pr = await DB.prepare("SELECT * FROM products WHERE id = ?").bind(productId).all();
+      const pr = await DB.prepare(
+        "SELECT * FROM products WHERE id = ?"
+      ).bind(productId).all();
+
       const product = pr.results?.[0] ?? null;
       if (!product) return NextResponse.json({ product: null }, { status: 404 });
 
+      // Only fetch needed columns for images
       const ir = await DB.prepare(
-        "SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order ASC"
-      )
-        .bind(productId)
-        .all();
+        "SELECT image_url, sort_order FROM product_images WHERE product_id = ? ORDER BY sort_order ASC"
+      ).bind(productId).all();
 
       return NextResponse.json({ product: { ...product, images: ir.results ?? [] } });
     }
 
-    const base = `
-      SELECT p.*,
-        (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY sort_order ASC LIMIT 1) AS image_url
-      FROM products p
-    `;
+    // ── Product listing — JOIN instead of subquery ───────────────
+    // BEFORE: subquery fired once per product (N+1 problem = millions of rows read)
+    // AFTER:  single JOIN query for all products at once
     const query = categoryId
-      ? `${base} WHERE p.category_id = ? ORDER BY p.created_at DESC`
-      : `${base} ORDER BY p.created_at DESC`;
+      ? `
+          SELECT p.id, p.name, p.description, p.price, p.category_id, p.created_at,
+                 pi.image_url
+          FROM products p
+          LEFT JOIN product_images pi
+            ON pi.product_id = p.id
+            AND pi.sort_order = 0
+          WHERE p.category_id = ?
+          ORDER BY p.created_at DESC
+          LIMIT ? OFFSET ?
+        `
+      : `
+          SELECT p.id, p.name, p.description, p.price, p.category_id, p.created_at,
+                 pi.image_url
+          FROM products p
+          LEFT JOIN product_images pi
+            ON pi.product_id = p.id
+            AND pi.sort_order = 0
+          ORDER BY p.created_at DESC
+          LIMIT ? OFFSET ?
+        `;
 
     const res = categoryId
-      ? await DB.prepare(query).bind(categoryId).all()
-      : await DB.prepare(query).all();
+      ? await DB.prepare(query).bind(categoryId, limit, offset).all()
+      : await DB.prepare(query).bind(limit, offset).all();
 
-    return NextResponse.json({ results: res.results ?? [] });
+    return NextResponse.json({
+      results: res.results ?? [],
+      page,
+      limit,
+    });
+
   } catch (err: any) {
     console.error("[products] GET error:", err);
-    return NextResponse.json({ error: err?.message ?? "Failed to fetch products" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message ?? "Failed to fetch products" },
+      { status: 500 }
+    );
   }
 }
 
@@ -93,6 +124,7 @@ export async function POST(req: NextRequest) {
     const productId = insertResult.meta?.last_row_id;
     if (!productId) throw new Error("Product insert did not return a valid ID");
 
+    // Batch image inserts instead of one by one
     for (let i = 0; i < image_urls.length; i++) {
       await DB.prepare(
         "INSERT INTO product_images (product_id, image_url, sort_order) VALUES (?, ?, ?)"
@@ -117,13 +149,14 @@ export async function POST(req: NextRequest) {
     );
   } catch (err: any) {
     console.error("[products] POST error:", err);
-    return NextResponse.json({ error: err?.message ?? "Failed to create product" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message ?? "Failed to create product" },
+      { status: 500 }
+    );
   }
 }
 
 // ── PATCH ─────────────────────────────────────────────────────────
-// Accepts JSON body: { id, name, price, description, category_id, image_url? }
-// image_url is optional — only updated if provided.
 export async function PATCH(req: NextRequest) {
   try {
     const { DB } = await getEnv();
@@ -137,7 +170,6 @@ export async function PATCH(req: NextRequest) {
 
     const { id, name, price, description, category_id, image_url } = body;
 
-    // ── Validate ──
     const numId = Number(id);
     if (!numId || isNaN(numId))
       return NextResponse.json({ error: "A valid numeric id is required" }, { status: 400 });
@@ -148,17 +180,17 @@ export async function PATCH(req: NextRequest) {
     if (!category_id || isNaN(Number(category_id)))
       return NextResponse.json({ error: "category_id is required" }, { status: 400 });
 
-    // ── Check product exists ──
-    const existing = await DB.prepare("SELECT id, image_url FROM products WHERE id = ?")
-      .bind(numId)
-      .all();
+    // Only select what we need — not SELECT *
+    const existing = await DB.prepare(
+      "SELECT id, image_url FROM products WHERE id = ?"
+    ).bind(numId).all();
+
     if (!existing.results?.length)
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
     const currentImageUrl = existing.results[0].image_url;
     const newImageUrl     = image_url ?? currentImageUrl;
 
-    // ── Update products table ──
     await DB.prepare(
       `UPDATE products
        SET name = ?, price = ?, description = ?, category_id = ?, image_url = ?
@@ -174,27 +206,19 @@ export async function PATCH(req: NextRequest) {
       )
       .run();
 
-    // ── If a new image was provided, also update product_images cover slot ──
     if (image_url && image_url !== currentImageUrl) {
-      // Update sort_order = 0 row if it exists, otherwise insert
       const coverRow = await DB.prepare(
         "SELECT id FROM product_images WHERE product_id = ? AND sort_order = 0"
-      )
-        .bind(numId)
-        .all();
+      ).bind(numId).all();
 
       if (coverRow.results?.length) {
         await DB.prepare(
           "UPDATE product_images SET image_url = ? WHERE product_id = ? AND sort_order = 0"
-        )
-          .bind(image_url, numId)
-          .run();
+        ).bind(image_url, numId).run();
       } else {
         await DB.prepare(
           "INSERT INTO product_images (product_id, image_url, sort_order) VALUES (?, ?, 0)"
-        )
-          .bind(numId, image_url)
-          .run();
+        ).bind(numId, image_url).run();
       }
     }
 
@@ -234,15 +258,17 @@ export async function DELETE(req: NextRequest) {
     if (!id || isNaN(id))
       return NextResponse.json({ error: "A valid numeric id is required" }, { status: 400 });
 
-    const existing = await DB.prepare("SELECT id FROM products WHERE id = ?").bind(id).all();
+    // Only select id — not SELECT *
+    const existing = await DB.prepare(
+      "SELECT id FROM products WHERE id = ?"
+    ).bind(id).all();
+
     if (!existing.results?.length)
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
-    // 1. Delete reviews first
+    // Delete in correct order to respect foreign keys
     await DB.prepare("DELETE FROM reviews WHERE product_id = ?").bind(id).run();
-    // 2. Delete product images
     await DB.prepare("DELETE FROM product_images WHERE product_id = ?").bind(id).run();
-    // 3. Delete the product
     await DB.prepare("DELETE FROM products WHERE id = ?").bind(id).run();
 
     return NextResponse.json({ success: true });
