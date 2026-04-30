@@ -191,9 +191,9 @@
   height: 100%;
   background: linear-gradient(
     90deg,
-    #e8001a 0%,
-    #ff6b84 40%,
-    #e8001a 80%
+   #8a00b8 0%,
+    #C03EFF 40%,
+    #8a00b8 80%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
