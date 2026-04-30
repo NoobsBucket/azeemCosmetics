@@ -83,7 +83,7 @@ const TABS = ["categories","products","banners","orders","carousel","brands","ho
 type Tab = typeof TABS[number];
 
 const TAB_COLORS: Record<Tab, string> = {
-  categories:"#FF3E5E", products:"#00D084", banners:"#FFE14D", orders:"#7C3AED",
+  categories:"#C03EFF", products:"#00D084", banners:"#FFE14D", orders:"#7C3AED",
   carousel:"#FF8C00", brands:"#0EA5E9", homepage:"#EC4899", settings:"#64748B",
 };
 
@@ -568,7 +568,7 @@ export default function Admin() {
             <h1 className="f-title">Dashboard</h1>
           </div>
           <div className="f-stats">
-            {[{n:categories.length,l:"Categories",c:"#FF3E5E"},{n:products.length,l:"Products",c:"#00D084"},{n:orders.length,l:"Orders",c:"#7C3AED"},{n:hpSections.length,l:"Sections",c:"#EC4899"}].map(s=>(
+            {[{n:categories.length,l:"Categories",c:"#C03EFF"},{n:products.length,l:"Products",c:"#00D084"},{n:orders.length,l:"Orders",c:"#7C3AED"},{n:hpSections.length,l:"Sections",c:"#EC4899"}].map(s=>(
               <div key={s.l} className="f-stat" style={{borderColor:s.c}}>
                 <span className="f-stat__n" style={{color:s.c}}>{s.n}</span>
                 <span className="f-stat__l">{s.l}</span>
@@ -592,7 +592,7 @@ export default function Admin() {
         {/* ══ CATEGORIES ══ */}
         {activeTab==="categories"&&(
           <div className="f-section">
-            <div className="f-card" style={{borderTopColor:"#FF3E5E"}}>
+            <div className="f-card" style={{borderTopColor:"#C03EFF"}}>
               <h2 className="f-card-title">🗂 Add Category</h2>
               <div className="f-stack">
                 <div className="f-grid-2">
@@ -604,16 +604,16 @@ export default function Admin() {
                   <label className="f-file-btn">📷 Choose Image<input type="file" accept="image/*" style={{display:"none"}} onChange={e=>{const f=e.target.files?.[0]||null;setCategoryImage(f);setCategoryImagePreview(f?URL.createObjectURL(f):"");}}/></label>
                   {categoryImagePreview&&(
                     <div style={{position:"relative",display:"inline-block",marginTop:10}}>
-                      <img src={categoryImagePreview} style={{width:64,height:64,borderRadius:"50%",objectFit:"cover",border:"3px solid #111",boxShadow:"3px 3px 0 #FF3E5E",display:"block"}} alt=""/>
-                      <button onClick={()=>{setCategoryImage(null);setCategoryImagePreview("");}} style={{position:"absolute",top:-8,right:-8,width:22,height:22,background:"#FF3E5E",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
+                      <img src={categoryImagePreview} style={{width:64,height:64,borderRadius:"50%",objectFit:"cover",border:"3px solid #111",boxShadow:"3px 3px 0 #C03EFF",display:"block"}} alt=""/>
+                      <button onClick={()=>{setCategoryImage(null);setCategoryImagePreview("");}} style={{position:"absolute",top:-8,right:-8,width:22,height:22,background:"#C03EFF",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
                     </div>
                   )}
                 </div>
-                {categoryUploading&&<div className="f-prog"><div className="f-prog__bar" style={{width:`${uploadProgress}%`,background:"#FF3E5E"}}/></div>}
+                {categoryUploading&&<div className="f-prog"><div className="f-prog__bar" style={{width:`${uploadProgress}%`,background:"#C03EFF"}}/></div>}
                 <button className="f-btn f-btn--red" onClick={addCategory} disabled={categoryUploading} style={{alignSelf:"flex-start"}}>{categoryUploading?"Uploading…":"+ Add Category"}</button>
               </div>
             </div>
-            <div className="f-card" style={{borderTopColor:"#FF3E5E"}}>
+            <div className="f-card" style={{borderTopColor:"#C03EFF"}}>
               <h2 className="f-card-title">All Categories <span className="f-count">{categories.length}</span></h2>
               {categories.length===0?<p className="f-empty">No categories yet.</p>:(
                 <div className="f-table-wrap"><table className="f-table">
@@ -654,7 +654,7 @@ export default function Admin() {
                         <div key={i} style={{position:"relative"}}>
                           <img src={src} style={{width:72,height:72,objectFit:"cover",borderRadius:8,border:"2.5px solid #111",boxShadow:i===0?"3px 3px 0 #00D084":"2px 2px 0 #111"}} alt=""/>
                           {i===0&&<span style={{position:"absolute",bottom:-8,left:"50%",transform:"translateX(-50%)",background:"#00D084",color:"#111",fontSize:"0.6rem",fontWeight:700,padding:"1px 6px",borderRadius:100,border:"1.5px solid #111",whiteSpace:"nowrap"}}>Cover</span>}
-                          <button onClick={()=>removeImage(i)} style={{position:"absolute",top:-8,right:-8,width:20,height:20,background:"#FF3E5E",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
+                          <button onClick={()=>removeImage(i)} style={{position:"absolute",top:-8,right:-8,width:20,height:20,background:"#C03EFF",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
                         </div>
                       ))}
                     </div>
@@ -893,7 +893,7 @@ export default function Admin() {
                   {brandLogoPreview&&(
                     <div style={{position:"relative",display:"inline-block",marginTop:10}}>
                       <img src={brandLogoPreview} style={{height:56,maxWidth:160,objectFit:"contain",borderRadius:8,border:"2px solid #111",background:"#fff",padding:6,display:"block",boxShadow:"3px 3px 0 #0EA5E9"}} alt=""/>
-                      <button onClick={()=>{setBrandLogo(null);setBrandLogoPreview("");}} style={{position:"absolute",top:-8,right:-8,width:22,height:22,background:"#FF3E5E",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
+                      <button onClick={()=>{setBrandLogo(null);setBrandLogoPreview("");}} style={{position:"absolute",top:-8,right:-8,width:22,height:22,background:"#C03EFF",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
                     </div>
                   )}
                 </div>
@@ -1119,7 +1119,7 @@ export default function Admin() {
                                 {form.brandLogoPreview&&(
                                   <div style={{position:"relative",display:"inline-block",marginTop:10}}>
                                     <img src={form.brandLogoPreview} style={{height:52,maxWidth:160,objectFit:"contain",borderRadius:8,border:"2px solid #111",background:"#fff",padding:6,display:"block",boxShadow:"3px 3px 0 #0EA5E9"}} alt=""/>
-                                    <button onClick={()=>setForm(section.id,{brandLogo:null,brandLogoPreview:""})} style={{position:"absolute",top:-8,right:-8,width:22,height:22,background:"#FF3E5E",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
+                                    <button onClick={()=>setForm(section.id,{brandLogo:null,brandLogoPreview:""})} style={{position:"absolute",top:-8,right:-8,width:22,height:22,background:"#C03EFF",color:"#fff",border:"2px solid #111",borderRadius:"50%",cursor:"pointer",fontSize:13,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
                                   </div>
                                 )}
                               </div>
@@ -1160,7 +1160,7 @@ export default function Admin() {
         {/* ══ SETTINGS ══ */}
         {activeTab==="settings"&&(
           <div className="f-section">
-            <div className="f-card" style={{borderTopColor:"#FF3E5E"}}>
+            <div className="f-card" style={{borderTopColor:"#C03EFF"}}>
               <h2 className="f-card-title">🛡 Admin Access</h2>
               <p className="f-hint">These emails have full admin dashboard access.</p>
               <div className="f-stack">
@@ -1168,7 +1168,7 @@ export default function Admin() {
                   {adminEmails.length===0&&<p className="f-empty">No admins loaded yet.</p>}
                   {adminEmails.map(email=>(
                     <div key={email} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:"#FFF1F3",border:"2px solid #FFB3C1",borderRadius:10,boxShadow:"2px 2px 0 #FFB3C1"}}>
-                      <div style={{width:32,height:32,borderRadius:"50%",background:"#FF3E5E",border:"2px solid #111",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:"0.8rem",flexShrink:0}}>{email[0].toUpperCase()}</div>
+                      <div style={{width:32,height:32,borderRadius:"50%",background:"#C03EFF",border:"2px solid #111",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:"0.8rem",flexShrink:0}}>{email[0].toUpperCase()}</div>
                       <span style={{flex:1,fontWeight:600,fontSize:"0.85rem",color:"#111"}}>{email}</span>
                       <button className="f-btn f-btn--red f-btn--sm" onClick={()=>removeAdminEmail(email)}>Remove</button>
                     </div>
@@ -1238,7 +1238,7 @@ const css = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
   .f-page { min-height: 100vh; background: #f5f5f5; padding: 80px 20px 100px; font-family: 'Jost', sans-serif; }
   .f-header { max-width: 1000px; margin: 0 auto 28px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-  .f-badge { display: inline-block; padding: 4px 12px; background: #FF3E5E; color: #fff; border: 2px solid #111; border-radius: 6px; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; box-shadow: 2px 2px 0 #111; margin-bottom: 8px; }
+  .f-badge { display: inline-block; padding: 4px 12px; background: #C03EFF; color: #fff; border: 2px solid #111; border-radius: 6px; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; box-shadow: 2px 2px 0 #111; margin-bottom: 8px; }
   .f-title { font-size: clamp(2rem,4vw,2.8rem); font-weight: 800; color: #111; letter-spacing: -0.04em; line-height: 1; }
   .f-stats { display: flex; gap: 10px; flex-wrap: wrap; }
   .f-stat { background: #fff; border: 2.5px solid #111; border-radius: 10px; padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 80px; box-shadow: 3px 3px 0 #111; border-top-width: 4px; }
@@ -1267,7 +1267,7 @@ const css = `
   .f-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border: 2px solid #111; border-radius: 8px; font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 800; cursor: pointer; transition: all 0.15s; white-space: nowrap; letter-spacing: 0.02em; }
   .f-btn:hover:not(:disabled) { transform: translateY(-2px); }
   .f-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-  .f-btn--red    { background: #FF3E5E; color: #fff; box-shadow: 3px 3px 0 #111; } .f-btn--red:hover:not(:disabled)    { box-shadow: 4px 5px 0 #111; }
+  .f-btn--red    { background: #C03EFF; color: #fff; box-shadow: 3px 3px 0 #111; } .f-btn--red:hover:not(:disabled)    { box-shadow: 4px 5px 0 #111; }
   .f-btn--green  { background: #00D084; color: #111; box-shadow: 3px 3px 0 #111; } .f-btn--green:hover:not(:disabled)  { box-shadow: 4px 5px 0 #111; }
   .f-btn--yellow { background: #FFE14D; color: #111; box-shadow: 3px 3px 0 #111; } .f-btn--yellow:hover:not(:disabled) { box-shadow: 4px 5px 0 #111; }
   .f-btn--blue   { background: #0EA5E9; color: #fff; box-shadow: 3px 3px 0 #111; } .f-btn--blue:hover:not(:disabled)   { box-shadow: 4px 5px 0 #111; }
@@ -1279,7 +1279,7 @@ const css = `
   .f-file-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; background: #fff; border: 2px dashed #111; border-radius: 8px; font-family: 'Jost', sans-serif; font-size: 0.8rem; font-weight: 700; color: #444; cursor: pointer; transition: all 0.15s; }
   .f-file-btn:hover { background: #FFE14D; border-style: solid; box-shadow: 2px 2px 0 #111; }
   .f-clear-btn { display: inline-block; margin-left: 8px; padding: 4px 10px; background: #fff; border: 1.5px solid #111; border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-  .f-clear-btn:hover { background: #FF3E5E; color: #fff; }
+  .f-clear-btn:hover { background: #C03EFF; color: #fff; }
   .f-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: #f5f5f5; border: 1.5px solid #111; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none; color: #111; transition: all 0.15s; }
   .f-icon-btn:hover { background: #FFE14D; box-shadow: 2px 2px 0 #111; }
   .f-prog { height: 8px; background: #f0f0f0; border: 2px solid #111; border-radius: 100px; overflow: hidden; }
@@ -1298,11 +1298,11 @@ const css = `
   .f-toast { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #fff; border: 2.5px solid #111; border-radius: 10px; box-shadow: 4px 4px 0 #111; font-family: 'Jost', sans-serif; font-size: 0.82rem; font-weight: 600; color: #111; min-width: 240px; max-width: 360px; pointer-events: all; animation: fToastIn 0.25s cubic-bezier(.22,1,.36,1) both; }
   @keyframes fToastIn { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
   .f-toast--success { border-color: #00D084; box-shadow: 4px 4px 0 #00D084; }
-  .f-toast--error   { border-color: #FF3E5E; box-shadow: 4px 4px 0 #FF3E5E; }
+  .f-toast--error   { border-color: #C03EFF; box-shadow: 4px 4px 0 #C03EFF; }
   .f-toast--info    { border-color: #0EA5E9; box-shadow: 4px 4px 0 #0EA5E9; }
   .f-toast__dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #111; flex-shrink: 0; }
   .f-toast--success .f-toast__dot { background: #00D084; }
-  .f-toast--error   .f-toast__dot { background: #FF3E5E; }
+  .f-toast--error   .f-toast__dot { background: #C03EFF; }
   .f-toast--info    .f-toast__dot { background: #0EA5E9; }
   .f-toast__msg { flex: 1; }
   .f-toast__x { background: none; border: none; font-size: 18px; cursor: pointer; color: #888; padding: 0; line-height: 1; }
@@ -1316,7 +1316,7 @@ const css = `
   .f-modal { background: #fff; border: 3px solid #111; border-radius: 16px; width: 100%; max-width: 540px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 6px 6px 0 #111; overflow: hidden; animation: fPopIn 0.22s cubic-bezier(.22,1,.36,1) both; }
   .f-modal__head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 2px solid #111; background: #111; }
   .f-modal__title { font-size: 1rem; font-weight: 800; color: #fff; }
-  .f-modal__close { width: 30px; height: 30px; background: #FF3E5E; border: 2px solid #fff; border-radius: 6px; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .f-modal__close { width: 30px; height: 30px; background: #C03EFF; border: 2px solid #fff; border-radius: 6px; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; }
   .f-modal__body { overflow-y: auto; padding: 20px 22px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
   .f-modal__foot { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 22px; border-top: 2px solid #111; background: #f9f9f9; }
   .f-img-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px; background: #f5f5f5; border: 2px solid #111; border-radius: 10px; }

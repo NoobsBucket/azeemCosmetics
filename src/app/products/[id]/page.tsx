@@ -36,7 +36,7 @@ function StarRating({ value, onChange, size = "1.2rem" }: {
           onMouseLeave={() => onChange && setHovered(0)}
           style={{
             fontSize: size, cursor: onChange ? "pointer" : "default",
-            color: star <= (hovered || value) ? "#FF3E5E" : "#ddd",
+            color: star <= (hovered || value) ? "#C03EFF" : "#ddd",
             transition: "color 0.12s, transform 0.12s", display: "inline-block",
             transform: hovered === star && onChange ? "scale(1.25)" : "scale(1)",
           }}>★</span>
@@ -125,7 +125,7 @@ function ImageLightbox({ images, activeIndex, productName, onClose }: {
           {images.map((img, i) => (
             <div key={img.id} onClick={() => setCurrent(i)} style={{
               width: 54, height: 54, borderRadius: 8, overflow: "hidden", cursor: "pointer",
-              border: current === i ? "3px solid #FF3E5E" : "3px solid rgba(255,255,255,0.25)",
+              border: current === i ? "3px solid #C03EFF" : "3px solid rgba(255,255,255,0.25)",
               boxShadow: current === i ? "2px 2px 0 #111" : "none",
               opacity: current === i ? 1 : 0.5, transition: "all 0.2s",
             }}>
@@ -320,7 +320,7 @@ export default function ProductDetailPage() {
         /* Info */
         .pd-eyebrow {
           font-size: 0.62rem; font-weight: 800; letter-spacing: 0.18em;
-          text-transform: uppercase; color: #FF3E5E; margin-bottom: 8px;
+          text-transform: uppercase; color: #C03EFF; margin-bottom: 8px;
         }
         .pd-title {
           font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800;
@@ -343,7 +343,7 @@ export default function ProductDetailPage() {
 
         /* Buttons */
         .pd-btn-buy {
-          width: 100%; padding: 15px; background: #FF3E5E; color: #fff;
+          width: 100%; padding: 15px; background: #C03EFF; color: #fff;
           border: 2.5px solid #111; border-radius: 12px; font-weight: 800;
           font-size: 0.95rem; cursor: pointer; font-family: 'Jost', sans-serif;
           box-shadow: 4px 4px 0 #111; transition: all 0.15s;
@@ -412,7 +412,7 @@ export default function ProductDetailPage() {
           padding: 28px; text-align: center; box-shadow: 4px 4px 0 #111; margin-bottom: 32px;
         }
         .pd-signin-btn {
-          padding: 10px 24px; background: #FF3E5E; color: #fff;
+          padding: 10px 24px; background: #C03EFF; color: #fff;
           border: 2.5px solid #111; border-radius: 100px;
           font-weight: 700; cursor: pointer; font-family: 'Jost', sans-serif;
           box-shadow: 2px 2px 0 #111; transition: all 0.15s;
@@ -486,8 +486,8 @@ export default function ProductDetailPage() {
                     <div key={img.id} className="pd-thumb"
                       onClick={() => setActiveImg(i)}
                       style={{
-                        border: activeImg === i ? "2.5px solid #FF3E5E" : "2.5px solid #111",
-                        boxShadow: activeImg === i ? "2px 2px 0 #FF3E5E" : "2px 2px 0 #111",
+                        border: activeImg === i ? "2.5px solid #C03EFF" : "2.5px solid #111",
+                        boxShadow: activeImg === i ? "2px 2px 0 #C03EFF" : "2px 2px 0 #111",
                         opacity: activeImg === i ? 1 : 0.6,
                       }}
                     >

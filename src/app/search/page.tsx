@@ -86,7 +86,7 @@ function SearchContent() {
           }}
         >
           Results for{" "}
-          <span style={{ color: "#ff3e5e" }}>"{query}"</span>
+          <span style={{ color: "#C03EFF" }}>"{query}"</span>
         </h1>
 
         <p
@@ -111,7 +111,7 @@ function SearchContent() {
                 width: 40,
                 height: 40,
                 border: "4px solid #eee",
-                borderTop: "4px solid #ff3e5e",
+                borderTop: "4px solid #C03EFF",
                 borderRadius: "50%",
                 margin: "0 auto",
                 animation: "spin 0.7s linear infinite",
@@ -123,14 +123,14 @@ function SearchContent() {
           <div style={{ textAlign: "center", marginTop: 80 }}>
             <div style={{ fontSize: "3rem" }}>😕</div>
             <p style={{ marginTop: 10, fontWeight: 600 }}>
-              No results for <span style={{ color: "#ff3e5e" }}>"{query}"</span>
+              No results for <span style={{ color: "#C03EFF" }}>"{query}"</span>
             </p>
             <button
               onClick={() => router.push("/")}
               style={{
                 marginTop: 20,
                 padding: "10px 24px",
-                background: "#ff3e5e",
+                background: "#C03EFF",
                 color: "#fff",
                 border: "2px solid #111",
                 borderRadius: 10,
@@ -204,7 +204,7 @@ function SearchContent() {
                         position: "absolute",
                         top: 10,
                         left: 10,
-                        background: "#ff3e5e",
+                        background: "#C03EFF",
                         color: "#fff",
                         fontSize: "0.65rem",
                         fontWeight: 800,
@@ -236,7 +236,7 @@ function SearchContent() {
                     style={{
                       fontSize: "1.05rem",
                       fontWeight: 900,
-                      color: "#ff3e5e",
+                      color: "#C03EFF",
                       marginBottom: 12,
                     }}
                   >
@@ -252,7 +252,7 @@ function SearchContent() {
                         padding: "8px",
                         background: added[product.id]
                           ? "#00c853"
-                          : "#ff3e5e",
+                          : "#C03EFF",
                         color: "#fff",
                         border: "2px solid #111",
                         borderRadius: 8,

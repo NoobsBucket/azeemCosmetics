@@ -161,7 +161,7 @@ const css = `
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF3E5E 0%, #FFE14D 50%, #00D084 100%);
+    background: linear-gradient(135deg, #C03EFF 0%, #FFE14D 50%, #00D084 100%);
     padding: 3px;
     box-shadow: 3px 3px 0 #111;
     transition: box-shadow 0.2s, background 0.25s;

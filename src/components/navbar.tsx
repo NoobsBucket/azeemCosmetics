@@ -35,7 +35,6 @@ export default function Navbar() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
-  // ✅ Use singleton — never create a new client inside the component
   const supabase = getSupabaseBrowser();
 
   const isAdmin = user?.email && adminEmails.includes(user.email);
@@ -243,7 +242,7 @@ export default function Navbar() {
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
           </span>
-          <span className="cc-logo__text">RehanCosmetics</span>
+          <span className="cc-logo__text">AzeenCosmetics</span>
         </button>
 
         {/* Desktop Search */}
@@ -360,17 +359,17 @@ const navCss = `
   }
   .cc-nav--scrolled { box-shadow: 0 4px 0 #111; }
   .cc-logo { display: flex; align-items: center; gap: 9px; background: none; border: none; cursor: pointer; padding: 0; flex-shrink: 0; }
-  .cc-logo__icon { width: 32px; height: 32px; background: #FF3E5E; border: 2px solid #111; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 2px 2px 0 #111; transition: transform 0.18s; }
+  .cc-logo__icon { width: 32px; height: 32px; background: #C03EFF; border: 2px solid #111; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 2px 2px 0 #111; transition: transform 0.18s; }
   .cc-logo:hover .cc-logo__icon { transform: rotate(-6deg) scale(1.08); }
   .cc-logo__text { font-size: 1.05rem; font-weight: 700; color: #111; letter-spacing: -0.02em; }
   .cc-search-wrap { flex: 1; max-width: 580px; min-width: 0; position: relative; z-index: 101; }
   .cc-search { display: flex; align-items: center; gap: 8px; background: #f5f5f5; border: 2px solid #111; border-radius: 6px; padding: 0 12px; height: 45px; transition: background 0.15s, box-shadow 0.15s; }
   .cc-search--focused { background: #fff; box-shadow: 3px 3px 0 #111; }
-  .cc-search__icon { color: #FF3E5E; flex-shrink: 0; }
+  .cc-search__icon { color: #C03EFF; flex-shrink: 0; }
   .cc-search__input { flex: 1; background: none; border: none; outline: none !important; box-shadow: none !important; -webkit-appearance: none; font-family: 'Jost', sans-serif; font-size: 0.83rem; font-weight: 500; color: #111; min-width: 0; }
   .cc-search__input::placeholder { color: #aaa; font-weight: 400; }
   .cc-search__input:focus { outline: none !important; box-shadow: none !important; border: none !important; }
-  .cc-search__spinner { width: 13px; height: 13px; flex-shrink: 0; border: 2px solid #ddd; border-top-color: #FF3E5E; border-radius: 50%; animation: ccSpin 0.6s linear infinite; }
+  .cc-search__spinner { width: 13px; height: 13px; flex-shrink: 0; border: 2px solid #ddd; border-top-color: #C03EFF; border-radius: 50%; animation: ccSpin 0.6s linear infinite; }
   @keyframes ccSpin { to { transform: rotate(360deg); } }
   .cc-search__clear { display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; flex-shrink: 0; background: #ddd; border: none; border-radius: 3px; color: #666; cursor: pointer; transition: background 0.15s, color 0.15s; padding: 0; }
   .cc-search__clear:hover { background: #111; color: #fff; }
@@ -386,7 +385,7 @@ const navCss = `
   .cc-suggestion-item__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .cc-suggestion-item__name { font-size: 0.84rem; font-weight: 600; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Jost', sans-serif; }
   .cc-suggestion-item__cat { font-size: 0.7rem; color: #999; font-family: 'Jost', sans-serif; }
-  .cc-suggestion-item__price { font-size: 0.84rem; font-weight: 700; color: #FF3E5E; flex-shrink: 0; font-family: 'Jost', sans-serif; }
+  .cc-suggestion-item__price { font-size: 0.84rem; font-weight: 700; color: #C03EFF; flex-shrink: 0; font-family: 'Jost', sans-serif; }
   .cc-suggestion-item__arrow { color: #ccc; flex-shrink: 0; transition: color 0.15s, transform 0.15s; }
   .cc-suggestion-item:hover .cc-suggestion-item__arrow { color: #111; transform: translateX(2px); }
   .cc-suggestions__footer { width: 100%; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 12px; background: #f9f9f9; border: none; border-top: 1.5px solid #eee; font-family: 'Jost', sans-serif; font-size: 0.8rem; font-weight: 700; color: #111; cursor: pointer; transition: background 0.15s; }
@@ -408,7 +407,7 @@ const navCss = `
   .cc-avatar { display: flex; align-items: center; gap: 6px; background: #fff; border: 2px solid #111; border-radius: 6px; padding: 4px 10px 4px 4px; cursor: pointer; transition: all 0.15s; }
   .cc-avatar:hover { background: #FFE14D; box-shadow: 2px 2px 0 #111; transform: translateY(-1px); }
   .cc-avatar__img { width: 24px; height: 24px; border-radius: 3px; object-fit: cover; border: 1.5px solid #111; }
-  .cc-avatar__initial { width: 24px; height: 24px; border-radius: 3px; background: #FF3E5E; color: #fff; border: 1.5px solid #111; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; }
+  .cc-avatar__initial { width: 24px; height: 24px; border-radius: 3px; background: #C03EFF; color: #fff; border: 1.5px solid #111; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; }
   .cc-avatar__name { font-size: 0.76rem; font-weight: 600; color: #111; }
   .cc-avatar__chevron { color: #555; transition: transform 0.2s; }
   .cc-avatar__chevron--open { transform: rotate(180deg); }

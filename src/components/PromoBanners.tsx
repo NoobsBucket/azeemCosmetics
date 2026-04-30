@@ -96,7 +96,7 @@ const css = `
   .pb-card:hover .pb-overlay { opacity: 1; transform: translateY(0); }
   .pb-heading { font-size: .95rem; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.5); margin: 0; }
   .pb-cta {
-    padding: 6px 14px; background: #FF3E5E; color: #fff;
+    padding: 6px 14px; background: #C03EFF; color: #fff;
     border: 2px solid #fff; border-radius: 7px;
     font-size: .75rem; font-weight: 800; cursor: pointer; font-family: 'Jost', sans-serif;
     box-shadow: 2px 2px 0 rgba(0,0,0,.3); transition: background .15s; white-space: nowrap;

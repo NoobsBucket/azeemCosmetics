@@ -257,7 +257,7 @@ const css = `
   .or-badge {
     display: inline-flex; align-items: center;
     padding: 5px 14px;
-    background: #FF3E5E; color: #fff;
+    background: #C03EFF; color: #fff;
     border: 2px solid #111; border-radius: 100px;
     font-size: 0.7rem; font-weight: 700;
     letter-spacing: 0.08em; text-transform: uppercase;
@@ -278,13 +278,13 @@ const css = `
     border: 2.5px solid #111;
     box-shadow: 3px 3px 0 #111;
     display: flex; align-items: center; justify-content: center;
-    color: #FF3E5E;
+    color: #C03EFF;
   }
   .or-muted { font-size: 0.92rem; color: #666; line-height: 1.7; margin-top: 10px; font-weight: 500; max-width: 340px; }
   .or-btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
   .or-btn-primary {
     padding: 13px 28px;
-    background: #FF3E5E; color: #fff;
+    background: #C03EFF; color: #fff;
     border: 2px solid #111; border-radius: 100px;
     font-family: 'Jost', sans-serif;
     font-size: 0.78rem; font-weight: 800;
@@ -354,21 +354,21 @@ const css = `
     background: #e0e0e0; border: 2px solid #ccc;
     transition: background 0.3s, border-color 0.3s; z-index: 1; flex-shrink: 0;
   }
-  .or-dot.done { background: #FF3E5E; border-color: #FF3E5E; }
+  .or-dot.done { background: #C03EFF; border-color: #C03EFF; }
   .or-dot.active { box-shadow: 0 0 0 4px rgba(255,62,94,0.2); }
   .or-step-label {
     font-size: 0.6rem; font-weight: 700; color: #ccc;
     letter-spacing: 0.08em; margin-top: 5px;
     text-transform: uppercase; text-align: center; white-space: nowrap;
   }
-  .or-step-label.done { color: #FF3E5E; }
+  .or-step-label.done { color: #C03EFF; }
   .or-line {
     position: absolute; top: 4px; left: 50%;
     width: 100%; height: 2px;
     background: #e0e0e0; z-index: 0;
     transition: background 0.3s;
   }
-  .or-line.done { background: #FF3E5E; }
+  .or-line.done { background: #C03EFF; }
 
   /* Body */
   .or-body { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(.22,1,.36,1); }
@@ -390,7 +390,7 @@ const css = `
   .or-item:last-child { border-bottom: none; }
   .or-item-dot {
     width: 7px; height: 7px; border-radius: 50%;
-    background: #FF3E5E; border: 1.5px solid #111; flex-shrink: 0;
+    background: #C03EFF; border: 1.5px solid #111; flex-shrink: 0;
   }
   .or-item-name { flex: 1; font-size: 0.87rem; font-weight: 600; color: #111; }
   .or-item-qty  { font-size: 0.72rem; font-weight: 700; color: #aaa; }
@@ -402,7 +402,7 @@ const css = `
     border-bottom: 1.5px solid #f5f5f5;
   }
   .or-delivery-row:last-child { border-bottom: none; }
-  .or-delivery-row svg { flex-shrink: 0; margin-top: 2px; color: #FF3E5E; }
+  .or-delivery-row svg { flex-shrink: 0; margin-top: 2px; color: #C03EFF; }
 @media (max-width: 1024px) {padding: 150px 20px 100px;}
 
   @media (max-width: 520px) {

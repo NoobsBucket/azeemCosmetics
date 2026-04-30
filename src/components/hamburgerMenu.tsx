@@ -210,7 +210,7 @@ const css = `
   .hm-avatar__initial {
     width: 36px; height: 36px;
     border-radius: 50%;
-    background: #FF3E5E;
+    background: #C03EFF;
     color: #fff;
     border: 2px solid #111;
     display: flex; align-items: center; justify-content: center;
@@ -247,7 +247,7 @@ const css = `
   }
   .hm-auth-btn--ghost { background: #fff; color: #111; box-shadow: 2px 2px 0 #111; }
   .hm-auth-btn--ghost:hover { background: #f5f5f5; }
-  .hm-auth-btn--primary { background: #FF3E5E; color: #fff; box-shadow: 2px 2px 0 #111; }
+  .hm-auth-btn--primary { background: #C03EFF; color: #fff; box-shadow: 2px 2px 0 #111; }
   .hm-auth-btn--primary:hover { background: #e8304f; }
 
   /* ── Nav ── */

@@ -29,7 +29,7 @@ export default function HomePage() {
        { key: "product_grid", enabled: true },
 
   5. Add to SECTION_DEFS in admin-page.tsx:
-       { key:"product_grid", label:"Product Grid", emoji:"🛍", color:"#FF3E5E", desc:"Your product cards" }
+       { key:"product_grid", label:"Product Grid", emoji:"🛍", color:"#C03EFF", desc:"Your product cards" }
 
   That's it — it will now appear in the admin Homepage tab and shuffle with the rest.
 */

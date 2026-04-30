@@ -58,12 +58,12 @@ const css = (cols: number) => `
     box-shadow: 4px 4px 0 #111; display: flex; align-items: center;
     justify-content: center; padding: 14px; transition: transform .15s, box-shadow .15s;
   }
-  .bg-card:hover { transform: translate(-3px,-3px); box-shadow: 7px 7px 0 #FF3E5E; border-color: #FF3E5E; }
+  .bg-card:hover { transform: translate(-3px,-3px); box-shadow: 7px 7px 0 #C03EFF; border-color: #C03EFF; }
   .bg-img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; transition: transform .2s; }
   .bg-card:hover .bg-img { transform: scale(1.06); }
   .bg-name { font-size: clamp(.75rem,1.5vw,1.1rem); font-weight: 900; color: #111; text-align: center; letter-spacing: -.02em; line-height: 1.2; word-break: break-word; transition: color .15s; }
-  .bg-card:hover .bg-name { color: #FF3E5E; }
-  .bg-corner { position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 26px 26px 0; border-color: transparent #FF3E5E transparent transparent; opacity: 0; transition: opacity .15s; }
+  .bg-card:hover .bg-name { color: #C03EFF; }
+  .bg-corner { position: absolute; top: 0; right: 0; width: 0; height: 0; border-style: solid; border-width: 0 26px 26px 0; border-color: transparent #C03EFF transparent transparent; opacity: 0; transition: opacity .15s; }
   .bg-card:hover .bg-corner { opacity: 1; }
   @media (max-width: 900px) { .bg-grid { grid-template-columns: repeat(${Math.min(cols, 4)}, 1fr); } }
   @media (max-width: 600px) { .bg-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } .bg-card { border-radius: 8px; padding: 10px; box-shadow: 3px 3px 0 #111; } }

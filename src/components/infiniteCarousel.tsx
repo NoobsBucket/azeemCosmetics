@@ -379,7 +379,7 @@ const css = `
   }
   .hc-arrow--visible { opacity: 1; pointer-events: auto; }
   .hc-arrow:hover {
-    background: #ff3e5e;
+    background: #C03EFF;
     color: #fff;
     border-color: #111;
     transform: translateY(calc(-50% - 2px));
@@ -397,7 +397,7 @@ const css = `
     background: #ccc; border: none; padding: 0; cursor: pointer;
     transition: background 0.25s, width 0.3s;
   }
-  .hc-dot--active { background: #ff3e5e; width: 26px; }
+  .hc-dot--active { background: #C03EFF; width: 26px; }
 
   /* ── Tablet (matches banner @media 768px) ── */
   @media (max-width: 768px) {

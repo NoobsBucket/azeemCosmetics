@@ -67,7 +67,7 @@ export default function LoginPage() {
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
             </div>
-            <span className="logo-text">RehanCosmatics</span>
+            <span className="logo-text">AzeenCosmatics</span>
           </div>
 
           {view === "login" ? (
@@ -168,7 +168,7 @@ const css = `
   }
 
   .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.3;pointer-events:none}
-  .blob1{width:380px;height:380px;background:#ff3e5e;top:-100px;left:-100px}
+  .blob1{width:380px;height:380px;background:#C03EFF;top:-100px;left:-100px}
   .blob2{width:280px;height:280px;background:#ffcc00;bottom:-80px;right:-60px}
   .blob3{width:200px;height:200px;background:#3ecfff;top:45%;left:65%}
 
@@ -190,14 +190,14 @@ const css = `
   .logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
   .logo-icon{
     width:40px;height:40px;border-radius:12px;
-    background:#ff3e5e;border:2px solid #111;
+    background:#C03EFF;border:2px solid #111;
     box-shadow:3px 3px 0 #111;
     display:flex;align-items:center;justify-content:center;
   }
-  .logo-text{font-size:1.25rem;font-weight:900;color:#ff3e5e;letter-spacing:-.02em}
+  .logo-text{font-size:1.25rem;font-weight:900;color:#C03EFF;letter-spacing:-.02em}
 
   .title{font-size:2rem;font-weight:900;color:#111;letter-spacing:-.04em;line-height:1.1;margin-bottom:6px}
-  .dot{color:#ff3e5e}
+  .dot{color:#C03EFF}
   .subtitle{font-size:.88rem;color:#666;font-weight:500;margin-bottom:24px}
 
   .oauth-row{display:flex;gap:10px;margin-bottom:18px}
@@ -228,7 +228,7 @@ const css = `
     padding:11px 14px;border-radius:10px;
     font-size:.83rem;font-weight:700;border:2px solid;
   }
-  .alert.err{background:#fff0f2;border-color:#ff3e5e;color:#c0002e}
+  .alert.err{background:#fff0f2;border-color:#C03EFF;color:#c0002e}
   .alert.ok{background:#f0fff6;border-color:#00c853;color:#006b2b}
 
   .field{display:flex;flex-direction:column}
@@ -242,12 +242,12 @@ const css = `
     box-shadow:3px 3px 0 #111;
     transition:box-shadow .15s,transform .15s,border-color .15s;
   }
-  .input:focus{background:#fff;border-color:#ff3e5e;box-shadow:4px 4px 0 #ff3e5e;transform:translate(-1px,-1px)}
+  .input:focus{background:#fff;border-color:#C03EFF;box-shadow:4px 4px 0 #C03EFF;transform:translate(-1px,-1px)}
   .input::placeholder{color:#ccc}
 
   .submit-btn{
     padding:13px;
-    background:#ff3e5e;color:#fff;
+    background:#C03EFF;color:#fff;
     border:2px solid #111;border-radius:12px;
     font-size:.95rem;font-weight:900;font-family:sans-serif;
     cursor:pointer;letter-spacing:.01em;
@@ -269,7 +269,7 @@ const css = `
 
   .link-btn{
     background:none;border:none;padding:0;
-    color:#ff3e5e;font-weight:800;cursor:pointer;
+    color:#C03EFF;font-weight:800;cursor:pointer;
     font-family:sans-serif;font-size:.83rem;
     text-decoration:underline;text-underline-offset:2px;
   }

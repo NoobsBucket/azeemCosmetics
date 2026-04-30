@@ -89,7 +89,7 @@ fetch("/api/settings")
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                 </svg>
               </span>
-              <span className="ft-logo__text">RehanCosmetics</span>
+              <span className="ft-logo__text">AzeenCosmetics</span>
             </button>
 
             <nav className="ft-nav">
@@ -131,7 +131,7 @@ fetch("/api/settings")
 
           {/* Bottom copyright */}
           <div className="ft-bottom">
-            <span className="ft-copy">© {new Date().getFullYear()} RehanCosmetics. All rights reserved.</span>
+            <span className="ft-copy">© {new Date().getFullYear()} AzeenCosmetics. All rights reserved.</span>
             <span className="ft-made">Made with ♥ in Pakistan</span>
           </div>
 
@@ -170,12 +170,12 @@ const css = `
   }
   .ft-logo__icon {
     width: 34px; height: 34px;
-    background: #ff3e5e; border: 2px solid #111; border-radius: 8px;
+    background: #C03EFF; border: 2px solid #111; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     color: #fff; box-shadow: 2px 2px 0 #111;
   }
   .ft-logo__text {
-    font-size: 1.1rem; font-weight: 900; color: #ff3e5e; letter-spacing: -0.02em;
+    font-size: 1.1rem; font-weight: 900; color: #C03EFF; letter-spacing: -0.02em;
   }
   .ft-nav {
     display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
@@ -246,7 +246,7 @@ const css = `
     font-size: 0.75rem; color: #aaa; font-weight: 500;
   }
   .ft-made {
-    font-size: 0.75rem; color: #ff3e5e; font-weight: 700;
+    font-size: 0.75rem; color: #C03EFF; font-weight: 700;
   }
 
   @media (max-width: 600px) {

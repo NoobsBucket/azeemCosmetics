@@ -3,5 +3,5 @@ compatibility_date = "2024-01-01"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "royalglow-arc-prod-db"
-database_id = "75db49b8-9ca0-4089-9415-79efc4ea0f9f"
+database_name = "azeemcosmetics"
+database_id = "e9435747-30e8-46c5-ac78-7ffe987856fc"

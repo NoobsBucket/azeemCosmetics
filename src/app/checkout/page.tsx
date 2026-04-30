@@ -284,7 +284,7 @@ const css = `
   .co-badge {
     display: inline-flex; align-items: center;
     padding: 5px 14px;
-    background: #FF3E5E;
+    background: #C03EFF;
     color: #fff;
     border: 2px solid #111;
     border-radius: 100px;
@@ -324,7 +324,7 @@ const css = `
   .co-step {
     font-family: 'Jost', sans-serif;
     font-weight: 900; font-size: 2.2rem;
-    line-height: 1; color: #FF3E5E;
+    line-height: 1; color: #C03EFF;
     flex-shrink: 0; margin-top: 2px;
     letter-spacing: -0.04em;
   }
@@ -362,7 +362,7 @@ const css = `
   .co-input::placeholder { color: #bbb; }
   .co-input:focus {
     outline: none;
-    border-color: #FF3E5E;
+    border-color: #C03EFF;
     box-shadow: 0 0 0 4px rgba(255,62,94,0.12);
     background: #fff;
   }
@@ -387,7 +387,7 @@ const css = `
   }
   .co-item-dot {
     width: 8px; height: 8px; border-radius: 50%;
-    background: #FF3E5E; border: 2px solid #111;
+    background: #C03EFF; border: 2px solid #111;
     flex-shrink: 0;
   }
   .co-item-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
@@ -421,7 +421,7 @@ const css = `
 
   .co-btn-primary {
     padding: 13px 28px;
-    background: #FF3E5E;
+    background: #C03EFF;
     color: #fff;
     border: 2px solid #111;
     border-radius: 100px;
@@ -502,7 +502,7 @@ const css = `
 
   .co-check-ring {
     width: 64px; height: 64px; border-radius: 50%;
-    background: #FF3E5E;
+    background: #C03EFF;
     border: 2.5px solid #111;
     box-shadow: 3px 3px 0 #111;
     display: flex; align-items: center; justify-content: center;

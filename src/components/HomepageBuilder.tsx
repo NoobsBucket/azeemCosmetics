@@ -61,7 +61,7 @@ function PromoSection({ items }: { items: BannerItem[] }) {
               display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 10,
             }}>
               {b.heading && <h3 style={{ fontSize: ".95rem", fontWeight: 900, color: "#fff", margin: 0 }}>{b.heading}</h3>}
-              {b.button_text && <button style={{ padding: "6px 14px", background: "#FF3E5E", color: "#fff", border: "2px solid #fff", borderRadius: 7, fontSize: ".75rem", fontWeight: 800, cursor: "pointer" }}>{b.button_text} →</button>}
+              {b.button_text && <button style={{ padding: "6px 14px", background: "#C03EFF", color: "#fff", border: "2px solid #fff", borderRadius: 7, fontSize: ".75rem", fontWeight: 800, cursor: "pointer" }}>{b.button_text} →</button>}
             </div>
           </div>
         ))}
@@ -193,7 +193,7 @@ function CategoryCirclesSection() {
               <div style={{ width: 88, height: 88, borderRadius: "50%", border: "2.5px solid #111", boxShadow: "4px 4px 0 #111", overflow: "hidden", background: "#FFF5F7", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {cat.image_url
                   ? <img src={cat.image_url} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  : <span style={{ fontSize: "1.8rem", fontWeight: 900, color: "#FF3E5E" }}>{cat.name[0]}</span>}
+                  : <span style={{ fontSize: "1.8rem", fontWeight: 900, color: "#C03EFF" }}>{cat.name[0]}</span>}
               </div>
               <span style={{ fontSize: ".76rem", fontWeight: 800, color: "#111", textAlign: "center", maxWidth: 88 }}>{cat.name}</span>
             </button>
@@ -233,7 +233,7 @@ export default function HomepageBuilder() {
 
   if (!loaded) return (
     <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
-      <div style={{ width: 36, height: 36, border: "4px solid #eee", borderTopColor: "#FF3E5E", borderRadius: "50%", animation: "hb-spin .7s linear infinite" }} />
+      <div style={{ width: 36, height: 36, border: "4px solid #eee", borderTopColor: "#C03EFF", borderRadius: "50%", animation: "hb-spin .7s linear infinite" }} />
       <style>{`@keyframes hb-spin { to { transform: rotate(360deg) } }`}</style>
     </div>
   );
